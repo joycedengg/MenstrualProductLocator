@@ -72,7 +72,7 @@ public class LoginActivity extends AppCompatActivity {
                     return;
                 }
 
-                goMapsActivity();
+                goMainActivity();
                 Toast.makeText(LoginActivity.this, "Success!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e == null) {
-                    goMapsActivity();
+                    goMainActivity();
                 } else {
                     Log.e(TAG, "Issue w signup: " + e, e);
                 }
@@ -94,8 +94,8 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void goMapsActivity() {
-        Intent intent = new Intent(this, MapsActivity.class);
+    public void goMainActivity() {
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
