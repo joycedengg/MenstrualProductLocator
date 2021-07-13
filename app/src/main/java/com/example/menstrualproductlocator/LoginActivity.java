@@ -35,9 +35,9 @@ public class LoginActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-//        if (ParseUser.getCurrentUser() != null){
-//            goMapsActivity();
-//        }
+        if (ParseUser.getCurrentUser() != null){
+            goMainActivity();
+        }
 
         etEmail = binding.etEmail;
         etPassword = binding.etPassword;
