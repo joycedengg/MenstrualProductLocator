@@ -26,6 +26,7 @@ import java.util.ArrayList;
 
 public class ProfileFragment extends Fragment {
 
+    ParseUser currentUser = ParseUser.getCurrentUser();
     TextView tvProfileEmail;
     ImageView ivProfilePic;
     Button btnLogout;
@@ -56,6 +57,8 @@ public class ProfileFragment extends Fragment {
         tvProfileEmail = binding.tvProfileEmail;
         ivProfilePic = binding.ivProfilePic;
         btnLogout = binding.btnLogout;
+
+        tvProfileEmail.setText(currentUser.getUsername());
 
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
