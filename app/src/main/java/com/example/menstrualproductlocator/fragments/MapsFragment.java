@@ -15,8 +15,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.menstrualproductlocator.R;
+import com.example.menstrualproductlocator.Supply;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -34,7 +36,7 @@ import com.parse.ParseUser;
 import java.util.List;
 import java.util.Map;
 
-public class MapsFragment extends Fragment {
+public class MapsFragment extends Fragment implements GoogleMap.OnMapLongClickListener{
 
     public static final String TAG = "Map Fragment";
 
@@ -57,12 +59,22 @@ public class MapsFragment extends Fragment {
          */
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            LatLng sydney = new LatLng(-34, 151);
-            googleMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-            saveCurrentUserLocation();
+            getCurrentUserLocation();
+            //saveCurrentUserLocation();
             showCurrentUserInMap(googleMap);
             showSuppliesInMap(googleMap);
+            googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(@NonNull LatLng latLng) {
+                    Toast.makeText(getContext(), "Long Press", Toast.LENGTH_LONG).show();
+                    Supply supply = new Supply();
+                    supply.setSupplyBuilding("test");
+                    supply.setSupplyLocation(getCurrentUserLocation());
+                    supply.saveInBackground();
+                }
+            });
+            Log.i(TAG, "Location: " + getCurrentUserLocation());
+            Log.i(TAG, "User: " + ParseUser.getCurrentUser().getUsername());
         }
     };
 
@@ -121,7 +133,7 @@ public class MapsFragment extends Fragment {
 
         switch (requestCode){
             case REQUEST_LOCATION:
-                saveCurrentUserLocation();
+                //saveCurrentUserLocation();
                 break;
         }
     }
@@ -135,7 +147,7 @@ public class MapsFragment extends Fragment {
             // if it's not possible to find the user, do something like returning to login activity
         }
         // otherwise, return the current user location
-        saveCurrentUserLocation();
+        //saveCurrentUserLocation();
         return currentUser.getParseGeoPoint("userLocation");
 
     }
@@ -150,7 +162,7 @@ public class MapsFragment extends Fragment {
         googleMap.addMarker(new MarkerOptions().position(currentUser).title(ParseUser.getCurrentUser().getUsername()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
         // zoom the map to the currentUserLocation
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUser, 5));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUser, 20));
     }
 
     private void showSuppliesInMap (final GoogleMap googleMap){
@@ -170,5 +182,10 @@ public class MapsFragment extends Fragment {
             }
         });
         ParseQuery.clearAllCachedResults();
+    }
+
+    @Override
+    public void onMapLongClick(@NonNull LatLng latLng) {
+
     }
 }
