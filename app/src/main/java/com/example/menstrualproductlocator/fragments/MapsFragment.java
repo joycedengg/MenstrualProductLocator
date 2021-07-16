@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.menstrualproductlocator.R;
 import com.example.menstrualproductlocator.Supply;
+import com.example.menstrualproductlocator.Request;
 import com.example.menstrualproductlocator.databinding.FragmentMapsBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,6 +44,7 @@ public class MapsFragment extends Fragment{
 
     private FragmentMapsBinding binding;
     private Button btnLogSupply;
+    private Button btnRequestProduct;
     public static final String TAG = "Map Fragment";
 
     private static final int REQUEST_LOCATION = 1;
@@ -68,6 +70,7 @@ public class MapsFragment extends Fragment{
             //saveCurrentUserLocation();
             showCurrentUserInMap(googleMap);
             showSuppliesInMap(googleMap);
+            showRequestsInMap(googleMap);
 
             btnLogSupply.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -79,6 +82,17 @@ public class MapsFragment extends Fragment{
                     showSuppliesInMap(googleMap);
                 }
             });
+            btnRequestProduct.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Request request = new Request();
+                    request.setRequestBuilding("request test");
+                    request.setRequestLocation(getCurrentUserLocation());
+                    request.saveInBackground();
+                    showRequestsInMap(googleMap);
+                }
+            });
+
             Log.i(TAG, "Location: " + getCurrentUserLocation());
             Log.i(TAG, "User: " + ParseUser.getCurrentUser().getUsername());
         }
@@ -93,6 +107,7 @@ public class MapsFragment extends Fragment{
         View view = binding.getRoot();
 
         btnLogSupply = binding.btnLogSupply;
+        btnRequestProduct = binding.btnRequestProduct;
         return view;
     }
 
@@ -182,12 +197,29 @@ public class MapsFragment extends Fragment{
             @Override  public void done(List<ParseObject> supplies, ParseException e) {
                 if (e == null) {
                     for(int i = 0; i < supplies.size(); i++) {
-                        LatLng storeLocation = new LatLng(supplies.get(i).getParseGeoPoint("location").getLatitude(), supplies.get(i).getParseGeoPoint("location").getLongitude());
-                        googleMap.addMarker(new MarkerOptions().position(storeLocation).title(supplies.get(i).getString("Building")).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        LatLng supplyLocation = new LatLng(supplies.get(i).getParseGeoPoint("location").getLatitude(), supplies.get(i).getParseGeoPoint("location").getLongitude());
+                        googleMap.addMarker(new MarkerOptions().position(supplyLocation).title(supplies.get(i).getString("Building")).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     }
                 } else {
-                    // handle the error
-                    Log.d("store", "Error: " + e.getMessage());
+
+                }
+            }
+        });
+        ParseQuery.clearAllCachedResults();
+    }
+
+    private void showRequestsInMap (final GoogleMap googleMap){
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("request");
+        query.whereExists("location");
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override  public void done(List<ParseObject> requests, ParseException e) {
+                if (e == null) {
+                    for(int i = 0; i < requests.size(); i++) {
+                        LatLng requestLocation = new LatLng(requests.get(i).getParseGeoPoint("location").getLatitude(), requests.get(i).getParseGeoPoint("location").getLongitude());
+                        googleMap.addMarker(new MarkerOptions().position(requestLocation).title(requests.get(i).getString("Building")).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                    }
+                } else {
+
                 }
             }
         });
