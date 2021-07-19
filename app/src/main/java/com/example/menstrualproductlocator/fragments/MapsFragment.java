@@ -47,7 +47,6 @@ public class MapsFragment extends Fragment {
     private Button btnLogSupply;
     private Button btnRequestProduct;
     public static final String TAG = "Map Fragment";
-
     private static final int REQUEST_LOCATION = 1;
     LocationManager locationManager;
 
@@ -101,12 +100,10 @@ public class MapsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(callback);
         }
-
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
 
@@ -136,7 +133,6 @@ public class MapsFragment extends Fragment {
         ParseUser currentUser = ParseUser.getCurrentUser();
         saveCurrentUserLocation();
         return currentUser.getParseGeoPoint("userLocation");
-
     }
 
     private void showCurrentUserInMap(final GoogleMap googleMap) {
