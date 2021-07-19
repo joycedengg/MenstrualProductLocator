@@ -118,7 +118,6 @@ public class MapsFragment extends Fragment {
 
             if (location != null) {
                 ParseGeoPoint currentUserLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-
                 ParseUser currentUser = ParseUser.getCurrentUser();
 
                 if (currentUser != null) {
@@ -139,19 +138,28 @@ public class MapsFragment extends Fragment {
         ParseGeoPoint currentUserLocation = getCurrentUserLocation();
 
         LatLng currentUser = new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude());
-        googleMap.addMarker(new MarkerOptions().position(currentUser).title(ParseUser.getCurrentUser().getUsername()).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+        googleMap.addMarker(new MarkerOptions()
+                .position(currentUser)
+                .title(ParseUser.getCurrentUser().getUsername())
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUser, 18));
     }
 
     private void showSuppliesInMap(final GoogleMap googleMap) {
-        ParseQuery < ParseObject > query = ParseQuery.getQuery("supply");
+        ParseQuery <ParseObject> query = ParseQuery.getQuery("supply");
         query.whereExists("location");
-        query.findInBackground(new FindCallback < ParseObject > () {
-            @Override public void done(List < ParseObject > supplies, ParseException e) {
+        query.findInBackground(new FindCallback <ParseObject> () {
+            @Override public void done(List <ParseObject> supplies, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < supplies.size(); i++) {
-                        LatLng supplyLocation = new LatLng(supplies.get(i).getParseGeoPoint("location").getLatitude(), supplies.get(i).getParseGeoPoint("location").getLongitude());
-                        googleMap.addMarker(new MarkerOptions().position(supplyLocation).title(supplies.get(i).getString("Building")).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
+                        LatLng supplyLocation = new LatLng(
+                                supplies.get(i).getParseGeoPoint("location").getLatitude(),
+                                supplies.get(i).getParseGeoPoint("location").getLongitude());
+
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(supplyLocation)
+                                .title(supplies.get(i).getString("Building"))
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     }
                 }
             }
@@ -160,14 +168,19 @@ public class MapsFragment extends Fragment {
     }
 
     private void showRequestsInMap(final GoogleMap googleMap) {
-        ParseQuery < ParseObject > query = ParseQuery.getQuery("request");
+        ParseQuery <ParseObject> query = ParseQuery.getQuery("request");
         query.whereExists("location");
-        query.findInBackground(new FindCallback < ParseObject > () {
-            @Override public void done(List < ParseObject > requests, ParseException e) {
+        query.findInBackground(new FindCallback <ParseObject> () {
+            @Override public void done(List <ParseObject> requests, ParseException e) {
                 if (e == null) {
                     for (int i = 0; i < requests.size(); i++) {
-                        LatLng requestLocation = new LatLng(requests.get(i).getParseGeoPoint("location").getLatitude(), requests.get(i).getParseGeoPoint("location").getLongitude());
-                        googleMap.addMarker(new MarkerOptions().position(requestLocation).title(requests.get(i).getString("Building")).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+                        LatLng requestLocation = new LatLng(requests.get(i).getParseGeoPoint("location").getLatitude(),
+                                requests.get(i).getParseGeoPoint("location").getLongitude());
+
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(requestLocation)
+                                .title(requests.get(i).getString("Building"))
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
                     }
                 }
             }
