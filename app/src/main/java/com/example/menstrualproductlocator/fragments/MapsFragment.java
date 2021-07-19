@@ -21,6 +21,7 @@ import android.widget.Toast;
 import com.example.menstrualproductlocator.R;
 import com.example.menstrualproductlocator.Supply;
 import com.example.menstrualproductlocator.Request;
+import com.example.menstrualproductlocator.Utils;
 import com.example.menstrualproductlocator.databinding.FragmentMapsBinding;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -58,8 +59,8 @@ public class MapsFragment extends Fragment {
             getCurrentUserLocation();
             saveCurrentUserLocation();
             showCurrentUserInMap(googleMap);
-            showSuppliesInMap(googleMap);
-            showRequestsInMap(googleMap);
+            Utils.showSuppliesInMap(googleMap);
+            Utils.showRequestsInMap(googleMap);
 
             btnLogSupply.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -68,7 +69,7 @@ public class MapsFragment extends Fragment {
                     supply.setSupplyBuilding("test");
                     supply.setSupplyLocation(getCurrentUserLocation());
                     supply.saveInBackground();
-                    showSuppliesInMap(googleMap);
+                    Utils.showSuppliesInMap(googleMap);
                 }
             });
             btnRequestProduct.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +79,7 @@ public class MapsFragment extends Fragment {
                     request.setRequestBuilding("request test");
                     request.setRequestLocation(getCurrentUserLocation());
                     request.saveInBackground();
-                    showRequestsInMap(googleMap);
+                    Utils.showRequestsInMap(googleMap);
                 }
             });
 
@@ -136,6 +137,7 @@ public class MapsFragment extends Fragment {
     }
 
     private void showCurrentUserInMap(final GoogleMap googleMap) {
+        int ZOOM_SCALE = 18; //18 is the zoom scope level since it zooms close enough to place building titles on the map
         ParseGeoPoint currentUserLocation = getCurrentUserLocation();
 
         LatLng currentUser = new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude());
@@ -143,50 +145,7 @@ public class MapsFragment extends Fragment {
                 .position(currentUser)
                 .title(ParseUser.getCurrentUser().getUsername())
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUser, 18));
-    }
-
-    private void showSuppliesInMap(final GoogleMap googleMap) {
-        ParseQuery <ParseObject> query = ParseQuery.getQuery("supply");
-        query.whereExists("location");
-        query.findInBackground(new FindCallback <ParseObject> () {
-            @Override public void done(List <ParseObject> supplies, ParseException e) {
-                if (e == null) {
-                    for (ParseObject supply : supplies) {
-                        LatLng supplyLocation = new LatLng(
-                                supply.getParseGeoPoint("location").getLatitude(),
-                                supply.getParseGeoPoint("location").getLongitude());
-
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(supplyLocation)
-                                .title(supply.getString("Building"))
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
-                    }
-                }
-            }
-        });
-        ParseQuery.clearAllCachedResults();
-    }
-
-    private void showRequestsInMap(final GoogleMap googleMap) {
-        ParseQuery <ParseObject> query = ParseQuery.getQuery("request");
-        query.whereExists("location");
-        query.findInBackground(new FindCallback <ParseObject> () {
-            @Override public void done(List <ParseObject> requests, ParseException e) {
-                if (e == null) {
-                    for (ParseObject request : requests) {
-                        LatLng requestLocation = new LatLng(
-                                request.getParseGeoPoint("location").getLatitude(),
-                                request.getParseGeoPoint("location").getLongitude());
-
-                        googleMap.addMarker(new MarkerOptions()
-                                .position(requestLocation)
-                                .title(request.getString("Building"))
-                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-                    }
-                }
-            }
-        });
-        ParseQuery.clearAllCachedResults();
     }
 }
