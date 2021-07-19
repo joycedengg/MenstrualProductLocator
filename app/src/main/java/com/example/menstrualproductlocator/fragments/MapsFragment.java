@@ -31,6 +31,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
 import com.parse.ParseObject;
@@ -151,14 +152,14 @@ public class MapsFragment extends Fragment {
         query.findInBackground(new FindCallback <ParseObject> () {
             @Override public void done(List <ParseObject> supplies, ParseException e) {
                 if (e == null) {
-                    for (int i = 0; i < supplies.size(); i++) {
+                    for (ParseObject supply : supplies) {
                         LatLng supplyLocation = new LatLng(
-                                supplies.get(i).getParseGeoPoint("location").getLatitude(),
-                                supplies.get(i).getParseGeoPoint("location").getLongitude());
+                                supply.getParseGeoPoint("location").getLatitude(),
+                                supply.getParseGeoPoint("location").getLongitude());
 
                         googleMap.addMarker(new MarkerOptions()
                                 .position(supplyLocation)
-                                .title(supplies.get(i).getString("Building"))
+                                .title(supply.getString("Building"))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     }
                 }
@@ -173,13 +174,14 @@ public class MapsFragment extends Fragment {
         query.findInBackground(new FindCallback <ParseObject> () {
             @Override public void done(List <ParseObject> requests, ParseException e) {
                 if (e == null) {
-                    for (int i = 0; i < requests.size(); i++) {
-                        LatLng requestLocation = new LatLng(requests.get(i).getParseGeoPoint("location").getLatitude(),
-                                requests.get(i).getParseGeoPoint("location").getLongitude());
+                    for (ParseObject request : requests) {
+                        LatLng requestLocation = new LatLng(
+                                request.getParseGeoPoint("location").getLatitude(),
+                                request.getParseGeoPoint("location").getLongitude());
 
                         googleMap.addMarker(new MarkerOptions()
                                 .position(requestLocation)
-                                .title(requests.get(i).getString("Building"))
+                                .title(request.getString("Building"))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
                     }
                 }
