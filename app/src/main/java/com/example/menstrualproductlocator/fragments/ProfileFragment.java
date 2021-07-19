@@ -33,10 +33,6 @@ public class ProfileFragment extends Fragment {
 
     FragmentProfileBinding binding;
 
-    public ProfileFragment() {
-        // Required empty public constructor
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
