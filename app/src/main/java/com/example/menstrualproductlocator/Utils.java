@@ -1,5 +1,8 @@
 package com.example.menstrualproductlocator;
 
+import android.app.PendingIntent;
+
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -8,10 +11,15 @@ import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public final class Utils {
+
+    public PendingIntent geofencePendingIntent;
+
     private Utils() {
         throw new UnsupportedOperationException("Utility class shouldn't be instantiated");
     }
@@ -60,5 +68,20 @@ public final class Utils {
         });
         ParseQuery.clearAllCachedResults();
         return googleMap;
+    }
+
+    public static void createGeofence(List<Geofence> list, LatLng location) {
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        list.add(new Geofence.Builder()
+                .setRequestId(currentUser.getUsername() + " location")
+                .setCircularRegion(location.latitude, location.longitude, (float) 100)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setNotificationResponsiveness(1000)
+                .build());
+    }
+
+    public static List<Geofence> returnGeofence(List<Geofence> list) {
+        return list;
     }
 }

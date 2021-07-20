@@ -6,6 +6,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -23,6 +24,7 @@ import com.example.menstrualproductlocator.Supply;
 import com.example.menstrualproductlocator.Request;
 import com.example.menstrualproductlocator.Utils;
 import com.example.menstrualproductlocator.databinding.FragmentMapsBinding;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -39,18 +41,20 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class MapsFragment extends Fragment {
 
     private FragmentMapsBinding binding;
-    private GeofencingClient geofencingClient;
     private Button btnLogSupply;
     private Button btnRequestProduct;
     public static final String TAG = "Map Fragment";
     private static final int REQUEST_LOCATION = 1;
     LocationManager locationManager;
+    private static List<Geofence> geofenceList = new ArrayList<>();
+
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
@@ -80,6 +84,9 @@ public class MapsFragment extends Fragment {
                     request.setRequestLocation(getCurrentUserLocation());
                     request.saveInBackground();
                     Utils.showRequestsInMap(googleMap);
+                    Utils.createGeofence(geofenceList, request.getRequestLatLng());
+                    Log.i(TAG, "Geofence: " + Utils.returnGeofence(geofenceList));
+
                 }
             });
 
