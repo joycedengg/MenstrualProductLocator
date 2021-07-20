@@ -115,31 +115,4 @@ public class MapsFragment extends Fragment {
         }
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
-
-//    private void saveCurrentUserLocation() {
-//        boolean hasNoFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-//        boolean hasNoCoarseLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-//
-//        if (hasNoFineLocationPermission && hasNoCoarseLocationPermission) {
-//            ActivityCompat.requestPermissions(getActivity(), new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
-//        } else {
-//            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//
-//            if (location != null) {
-//                ParseGeoPoint currentUserLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-//                ParseUser currentUser = ParseUser.getCurrentUser();
-//
-//                if (currentUser != null) {
-//                    currentUser.put("userLocation", currentUserLocation);
-//                    currentUser.saveInBackground();
-//                }
-//            }
-//        }
-//    }
-
-//    private ParseGeoPoint getCurrentUserLocation() {
-//        ParseUser currentUser = ParseUser.getCurrentUser();
-//        saveCurrentUserLocation();
-//        return currentUser.getParseGeoPoint("userLocation");
-//    }
 }
