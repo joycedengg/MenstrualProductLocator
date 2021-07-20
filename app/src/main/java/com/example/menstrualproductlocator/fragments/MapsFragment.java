@@ -51,7 +51,7 @@ public class MapsFragment extends Fragment {
     private Button btnLogSupply;
     private Button btnRequestProduct;
     public static final String TAG = "Map Fragment";
-    private static final int REQUEST_LOCATION = 1;
+//    private static final int REQUEST_LOCATION = 1;
     LocationManager locationManager;
     private static List<Geofence> geofenceList = new ArrayList<>();
 
@@ -60,9 +60,9 @@ public class MapsFragment extends Fragment {
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
-            getCurrentUserLocation();
-            saveCurrentUserLocation();
-            showCurrentUserInMap(googleMap);
+            Utils.getCurrentUserLocation(getActivity(), locationManager);
+            Utils.saveCurrentUserLocation(getActivity(), locationManager);
+            Utils.showCurrentUserInMap(googleMap, getActivity(), locationManager);
             Utils.showSuppliesInMap(googleMap);
             Utils.showRequestsInMap(googleMap);
 
@@ -71,7 +71,7 @@ public class MapsFragment extends Fragment {
                 public void onClick(View v) {
                     Supply supply = new Supply();
                     supply.setSupplyBuilding("test");
-                    supply.setSupplyLocation(getCurrentUserLocation());
+                    supply.setSupplyLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
                     supply.saveInBackground();
                     Utils.showSuppliesInMap(googleMap);
                 }
@@ -79,9 +79,9 @@ public class MapsFragment extends Fragment {
             btnRequestProduct.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Request request = new Request();
+                    Request request = new Request(false);
                     request.setRequestBuilding("request test");
-                    request.setRequestLocation(getCurrentUserLocation());
+                    request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
                     request.saveInBackground();
                     Utils.showRequestsInMap(googleMap);
                     Utils.createGeofence(geofenceList, request.getRequestLatLng());
@@ -90,7 +90,7 @@ public class MapsFragment extends Fragment {
                 }
             });
 
-            Log.i(TAG, "Location: " + getCurrentUserLocation());
+            Log.i(TAG, "Location: " + Utils.getCurrentUserLocation(getActivity(), locationManager));
             Log.i(TAG, "User: " + ParseUser.getCurrentUser().getUsername());
         }
     };
@@ -116,43 +116,30 @@ public class MapsFragment extends Fragment {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
 
-    private void saveCurrentUserLocation() {
-        boolean hasNoFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-        boolean hasNoCoarseLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+//    private void saveCurrentUserLocation() {
+//        boolean hasNoFineLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+//        boolean hasNoCoarseLocationPermission = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
+//
+//        if (hasNoFineLocationPermission && hasNoCoarseLocationPermission) {
+//            ActivityCompat.requestPermissions(getActivity(), new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
+//        } else {
+//            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//
+//            if (location != null) {
+//                ParseGeoPoint currentUserLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
+//                ParseUser currentUser = ParseUser.getCurrentUser();
+//
+//                if (currentUser != null) {
+//                    currentUser.put("userLocation", currentUserLocation);
+//                    currentUser.saveInBackground();
+//                }
+//            }
+//        }
+//    }
 
-        if (hasNoFineLocationPermission && hasNoCoarseLocationPermission) {
-            ActivityCompat.requestPermissions(getActivity(), new String[] {android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_LOCATION);
-        } else {
-            Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-
-            if (location != null) {
-                ParseGeoPoint currentUserLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
-                ParseUser currentUser = ParseUser.getCurrentUser();
-
-                if (currentUser != null) {
-                    currentUser.put("userLocation", currentUserLocation);
-                    currentUser.saveInBackground();
-                }
-            }
-        }
-    }
-
-    private ParseGeoPoint getCurrentUserLocation() {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        saveCurrentUserLocation();
-        return currentUser.getParseGeoPoint("userLocation");
-    }
-
-    private void showCurrentUserInMap(final GoogleMap googleMap) {
-        int ZOOM_SCALE = 18; //18 is the zoom scope level since it zooms close enough to place building titles on the map
-        ParseGeoPoint currentUserLocation = getCurrentUserLocation();
-
-        LatLng currentUser = new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude());
-        googleMap.addMarker(new MarkerOptions()
-                .position(currentUser)
-                .title(ParseUser.getCurrentUser().getUsername())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUser, 18));
-    }
+//    private ParseGeoPoint getCurrentUserLocation() {
+//        ParseUser currentUser = ParseUser.getCurrentUser();
+//        saveCurrentUserLocation();
+//        return currentUser.getParseGeoPoint("userLocation");
+//    }
 }

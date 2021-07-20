@@ -8,11 +8,17 @@ import com.parse.ParseObject;
 @ParseClassName("request")
 public class Request extends ParseObject {
 
+    boolean isCompleted;
+
     public static final String KEY_BUILDING = "building";
     public static final String KEY_LOCATION = "location";
 
     public Request() {
 
+    }
+
+    public Request(boolean isCompleted) {
+        isCompleted = this.isCompleted;
     }
     public String getRequestBuilding() {
         return getString(KEY_BUILDING);
@@ -28,5 +34,11 @@ public class Request extends ParseObject {
     }
     public LatLng getRequestLatLng() {
         return new LatLng(getParseGeoPoint(KEY_LOCATION).getLatitude(), getParseGeoPoint(KEY_LOCATION).getLongitude());
+    }
+    public void setCompleted() {
+        isCompleted = true;
+    }
+    public boolean isComplete() {
+        return isCompleted;
     }
 }
