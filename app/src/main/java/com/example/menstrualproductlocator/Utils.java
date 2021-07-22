@@ -1,21 +1,37 @@
 package com.example.menstrualproductlocator;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -28,10 +44,11 @@ import java.util.List;
 
 public final class Utils {
 
-    public PendingIntent geofencePendingIntent;
     public Context context;
-    private static final int REQUEST_LOCATION = 1;
-
+    public static final String TAG = "utils";
+    public static final int REQUEST_LOCATION = 1;
+    public static String ID = "ID";
+    public static final int RADIUS = 50; //goefence radius is 50m
 
     private Utils() {
         throw new UnsupportedOperationException("Utility class shouldn't be instantiated");
@@ -83,19 +100,15 @@ public final class Utils {
         return googleMap;
     }
 
-    public static void createGeofence(List<Geofence> list, LatLng location) {
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        list.add(new Geofence.Builder()
-                .setRequestId(currentUser.getUsername() + " location")
-                .setCircularRegion(location.latitude, location.longitude, (float) 100)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                .setNotificationResponsiveness(1000)
-                .build());
-    }
 
-    public static List<Geofence> returnGeofence(List<Geofence> list) {
-        return list;
+    public static void addCircle(LatLng location, float radius, GoogleMap map) {
+        CircleOptions circleOptions = new CircleOptions();
+        circleOptions.center(location);
+        circleOptions.radius(radius);
+        circleOptions.strokeColor(Color.argb(255, 255, 0 ,0));
+        circleOptions.fillColor(Color.argb(64, 255, 0 ,0));
+        circleOptions.strokeWidth(4);
+        map.addCircle(circleOptions);
     }
 
     public static void showCurrentUserInMap(final GoogleMap googleMap, Activity activity, LocationManager locationManager) {
@@ -136,5 +149,56 @@ public final class Utils {
                 }
             }
         }
+    }
+
+    public static void showAlertDialogForRequest(Context context, final LatLng point, GoogleMap googleMap, Request request, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
+        View messageView = LayoutInflater.from(context).inflate(R.layout.log_request_item, null);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+        alertDialogBuilder.setView(messageView);
+
+        final AlertDialog alertDialog = alertDialogBuilder.create();
+
+        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
+                        String requestBuilding = ((EditText) alertDialog.findViewById(R.id.etBuilding)).getText().toString();
+                        request.setRequestBuilding(requestBuilding);
+                        String requestProductType = ((EditText) alertDialog.findViewById(R.id.etProductType)).getText().toString();
+                        request.setRequestProductType(requestProductType);
+                        request.saveInBackground();
+                        addGeofence(request.getRequestLatLng(), RADIUS, geofenceHelper, geofencingClient);
+                        Utils.addCircle(request.getRequestLatLng(), RADIUS, googleMap);
+                    }
+                });
+
+        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+                });
+
+        alertDialog.show();
+    }
+
+    @SuppressLint("MissingPermission")
+    public static void addGeofence(LatLng locaton, float radius, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
+        Geofence geofence = geofenceHelper.getGeofence(ID, locaton, radius,Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL);
+        GeofencingRequest geofencingRequest = geofenceHelper.getGeofencingRequest(geofence);
+        PendingIntent pendingIntent = geofenceHelper.getPendingIntent();
+        geofencingClient.addGeofences(geofencingRequest, pendingIntent)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d(TAG, "onSuccess: Geofence added with ID: " + ID);
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        String errorMessage = geofenceHelper.getErrorString(e);
+                        Log.d(TAG, "onFailure: " + errorMessage);
+                    }
+                });
     }
 }

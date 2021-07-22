@@ -1,5 +1,6 @@
 package com.example.menstrualproductlocator.fragments;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -13,6 +14,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,7 +23,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.example.menstrualproductlocator.AppBroadcastReceiver;
+import androidx.activity.result.contract.ActivityResultContracts.*;
+
+import com.example.menstrualproductlocator.GeofenceBroadcastReceiver;
+import com.example.menstrualproductlocator.GeofenceHelper;
 import com.example.menstrualproductlocator.R;
 import com.example.menstrualproductlocator.Supply;
 import com.example.menstrualproductlocator.Request;
@@ -30,9 +35,13 @@ import com.example.menstrualproductlocator.databinding.FragmentMapsBinding;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -43,19 +52,22 @@ public class MapsFragment extends Fragment {
     private FragmentMapsBinding binding;
     private Button btnLogSupply;
     private Button btnRequestProduct;
-    private PendingIntent geofencePendingIntent;
     public static final String TAG = "Map Fragment";
     private GeofencingClient geofencingClient;
     LocationManager locationManager;
-    private static List<Geofence> geofenceList = new ArrayList<>();
     private static final int REQUEST_LOCATION = 1;
+    private static final int REQUEST_BACKGROUND_LOCATION = 2;
     private GoogleMap map;
+    private GeofenceHelper geofenceHelper;
 
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
 
         @Override
         public void onMapReady(GoogleMap googleMap) {
+            geofencingClient = LocationServices.getGeofencingClient(getContext());
+            geofenceHelper = new GeofenceHelper(getContext());
+
             map = googleMap;
             Utils.getCurrentUserLocation(getActivity(), locationManager);
             Utils.saveCurrentUserLocation(getActivity(), locationManager);
@@ -87,14 +99,26 @@ public class MapsFragment extends Fragment {
             btnRequestProduct.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Request request = new Request(false);
-                    request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
-                    request.showAlertDialogForRequest(getContext(), request.getRequestLatLng(), map, request);
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                            Request request = new Request(false);
+                            request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
+                            Utils.showAlertDialogForRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
+                            Utils.showRequestsInMap(map);
+                        } else {
+                            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                                ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_BACKGROUND_LOCATION);
+                            } else {
+                                ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_BACKGROUND_LOCATION);
+                            }
+                        }
+                    } else {
+                        Request request = new Request(false);
+                        request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
+                        Utils.showAlertDialogForRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
 
-                    Utils.showRequestsInMap(map);
-                    Utils.createGeofence(geofenceList, request.getRequestLatLng());
-
-                    Log.i(TAG, "Geofence: " + Utils.returnGeofence(geofenceList));
+                        Utils.showRequestsInMap(map);
+                    }
 
                 }
             });
@@ -117,6 +141,8 @@ public class MapsFragment extends Fragment {
 
         btnLogSupply = binding.btnLogSupply;
         btnRequestProduct = binding.btnRequestProduct;
+
+        geofencingClient = LocationServices.getGeofencingClient(getContext());
         return view;
     }
 
@@ -130,70 +156,9 @@ public class MapsFragment extends Fragment {
         locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
     }
 
-    private void addGeofence() {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                    .addOnSuccessListener(getActivity(), aVoid -> {
-                        Toast.makeText(getContext()
-                                , "Geofencing has started", Toast.LENGTH_SHORT).show();
-                    })
-                    .addOnFailureListener(getActivity(), e -> {
-                        Toast.makeText(getContext()
-                                , "Geofencing failed", Toast.LENGTH_SHORT).show();
-
-                    });
-            return;
+    private ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new RequestPermission(), isGranted -> {
+        if (isGranted) {
+            enableUserLocation();
         }
-        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                .addOnSuccessListener(getActivity(), aVoid -> {
-                    Toast.makeText(getContext()
-                            , "Geofencing has started", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(getActivity(), e -> {
-                    Toast.makeText(getContext()
-                            , "Geofencing failed", Toast.LENGTH_SHORT).show();
-
-                });
-    }
-
-    private void removeGeofence() {
-        geofencingClient.removeGeofences(getGeofencePendingIntent())
-                .addOnSuccessListener(getActivity(), aVoid -> {
-                    Toast.makeText(getContext()
-                            , "Geofencing has been removed", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(getActivity(), e -> {
-                    Toast.makeText(getContext()
-                            , "Geofencing could not be removed", Toast.LENGTH_SHORT).show();
-                });
-    }
-
-    private GeofencingRequest getGeofencingRequest() {
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-        builder.addGeofences(geofenceList);
-        return builder.build();
-    }
-
-    private PendingIntent getGeofencePendingIntent() {
-        // Reuse the PendingIntent if we already have it.
-        if (geofencePendingIntent != null) {
-            return geofencePendingIntent;
-        }
-        Toast.makeText(getContext(), "starting broadcast", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(getContext(), AppBroadcastReceiver.class);
-        geofencePendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        return geofencePendingIntent;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_LOCATION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                enableUserLocation();
-            } else {
-                Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+    });
 }
