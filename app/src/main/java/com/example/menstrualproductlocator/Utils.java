@@ -77,20 +77,22 @@ public final class Utils {
         return googleMap;
     }
 
-    public static GoogleMap showRequestsInMap(final GoogleMap googleMap) {
+    public static GoogleMap showRequestsInMap(final GoogleMap googleMap, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
         ParseQuery <ParseObject> query = ParseQuery.getQuery("request");
-        query.whereExists("location");
+        query.whereDoesNotExist("isCompleted");
         query.findInBackground(new FindCallback<ParseObject>() {
-            @Override public void done(List<ParseObject> requests, ParseException e) {
+            @Override public void done(List<ParseObject> geofences, ParseException e) {
                 if (e == null) {
-                    for (ParseObject request : requests) {
+                    for (ParseObject uncompletedRequest : geofences) {
                         LatLng requestLocation = new LatLng(
-                                request.getParseGeoPoint("location").getLatitude(),
-                                request.getParseGeoPoint("location").getLongitude());
+                                uncompletedRequest.getParseGeoPoint("location").getLatitude(),
+                                uncompletedRequest.getParseGeoPoint("location").getLongitude());
+                        addGeofence(requestLocation, RADIUS, geofenceHelper, geofencingClient);
+                        addCircle(requestLocation, RADIUS, googleMap);
 
                         googleMap.addMarker(new MarkerOptions()
                                 .position(requestLocation)
-                                .title(request.getString("Building"))
+                                .title(uncompletedRequest.getString("Building"))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
                     }
                 }

@@ -73,7 +73,7 @@ public class MapsFragment extends Fragment {
             Utils.saveCurrentUserLocation(getActivity(), locationManager);
             Utils.showCurrentUserInMap(map, getActivity(), locationManager);
             Utils.showSuppliesInMap(map);
-            Utils.showRequestsInMap(map);
+            Utils.showRequestsInMap(map, geofenceHelper, geofencingClient);
 
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 enableUserLocation();
@@ -101,10 +101,9 @@ public class MapsFragment extends Fragment {
                 public void onClick(View v) {
                     if (Build.VERSION.SDK_INT >= 29) {
                         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                            Request request = new Request(false);
+                            Request request = new Request();
                             request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
                             Utils.showAlertDialogForRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
-                            Utils.showRequestsInMap(map);
                         } else {
                             if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                                 ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_BACKGROUND_LOCATION);
@@ -113,11 +112,9 @@ public class MapsFragment extends Fragment {
                             }
                         }
                     } else {
-                        Request request = new Request(false);
+                        Request request = new Request();
                         request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
                         Utils.showAlertDialogForRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
-
-                        Utils.showRequestsInMap(map);
                     }
 
                 }

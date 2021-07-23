@@ -21,18 +21,13 @@ import com.parse.ParseObject;
 @ParseClassName("request")
 public class Request extends ParseObject {
 
-    boolean isCompleted;
-
     public static final String KEY_BUILDING = "building";
     public static final String KEY_LOCATION = "location";
     public static final String KEY_PRODUCT_TYPE = "productType";
+    public static final String KEY_IS_COMPLETED = "isCompleted";
 
     public Request() {
 
-    }
-
-    public Request(boolean isCompleted) {
-        isCompleted = this.isCompleted;
     }
 
     public String getRequestBuilding() {
@@ -64,10 +59,10 @@ public class Request extends ParseObject {
     }
 
     public void setCompleted() {
-        isCompleted = true;
+        put(KEY_IS_COMPLETED, true);
     }
 
     public boolean isComplete() {
-        return isCompleted;
+        return getBoolean(KEY_IS_COMPLETED);
     }
 }
