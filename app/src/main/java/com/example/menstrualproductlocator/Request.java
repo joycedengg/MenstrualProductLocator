@@ -46,6 +46,9 @@ public class Request extends ParseObject {
         put(KEY_LOCATION, location);
     }
 
+    public void setRequestLocation(LatLng latLng) { put(KEY_LOCATION, new ParseGeoPoint(latLng.latitude, latLng.longitude));
+    }
+
     public LatLng getRequestLatLng() {
         return new LatLng(getParseGeoPoint(KEY_LOCATION).getLatitude(), getParseGeoPoint(KEY_LOCATION).getLongitude());
     }

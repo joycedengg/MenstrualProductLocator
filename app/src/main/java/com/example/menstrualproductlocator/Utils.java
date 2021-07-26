@@ -92,12 +92,10 @@ public final class Utils {
                         addGeofence(requestLocation, RADIUS, geofenceHelper, geofencingClient);
                         addCircle(requestLocation, RADIUS, googleMap);
 
-
-                        Marker requestMarker = googleMap.addMarker(new MarkerOptions()
+                        googleMap.addMarker(new MarkerOptions()
                                 .position(requestLocation)
                                 .title("Request " + geofences.indexOf(uncompletedRequest))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
-
 
 
                         googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
@@ -116,22 +114,9 @@ public final class Utils {
                                     building.setText(tvBuilding);
                                     productType.setText(tvProductType);
 
-                                   /* ParseQuery <ParseObject> query = ParseQuery.getQuery("request");
-                                    query.whereEqualTo("location", new ParseGeoPoint(requestMarker.getPosition().latitude, requestMarker.getPosition().longitude));
-                                    query.findInBackground(new FindCallback <ParseObject> () {
-                                        @Override public void done(List <ParseObject> requests, ParseException e) {
-                                            if (e == null) {
-                                                String tvBuilding = requests.get(0).getString("building");
-                                                building.setText(tvBuilding);
-                                                Log.i(TAG, "array: " + requests.toString());
-                                            }
-                                            Log.i(TAG, "array: " + requests.toString());
-                                        }
-                                    });*/
-
                                     final AlertDialog alertDialog = alertDialogBuilder.create();
 
-                                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "Accept",
                                             new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
@@ -151,6 +136,7 @@ public final class Utils {
                         });
                     }
                 }
+                ParseQuery.clearAllCachedResults();
             }
         });
         ParseQuery.clearAllCachedResults();
@@ -200,10 +186,10 @@ public final class Utils {
                 ParseGeoPoint currentUserLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
                 ParseUser currentUser = ParseUser.getCurrentUser();
 
-                if (currentUser != null) {
-                    currentUser.put("userLocation", currentUserLocation);
-                    currentUser.saveInBackground();
-                }
+//                if (currentUser != null) {
+//                    currentUser.put("userLocation", currentUserLocation);
+//                    currentUser.saveInBackground();
+//                }
             }
         }
     }
@@ -224,8 +210,9 @@ public final class Utils {
                         String requestProductType = ((EditText) alertDialog.findViewById(R.id.etProductType)).getText().toString();
                         request.setRequestProductType(requestProductType);
                         request.saveInBackground();
-                        addGeofence(request.getRequestLatLng(), RADIUS, geofenceHelper, geofencingClient);
+                        Utils.addGeofence(request.getRequestLatLng(), RADIUS, geofenceHelper, geofencingClient);
                         Utils.addCircle(request.getRequestLatLng(), RADIUS, googleMap);
+                        Utils.showRequestsInMap(googleMap, geofenceHelper, geofencingClient, context);
                     }
                 });
 
