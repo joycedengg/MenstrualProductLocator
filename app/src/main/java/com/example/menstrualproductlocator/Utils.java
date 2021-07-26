@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -48,7 +50,7 @@ public final class Utils {
     public static final String TAG = "utils";
     public static final int REQUEST_LOCATION = 1;
     public static String ID = "ID";
-    public static final int RADIUS = 50; //goefence radius is 50m
+    public static final int RADIUS = 100; //goefence radius is 50m
 
     private Utils() {
         throw new UnsupportedOperationException("Utility class shouldn't be instantiated");
@@ -67,7 +69,7 @@ public final class Utils {
 
                         googleMap.addMarker(new MarkerOptions()
                                 .position(supplyLocation)
-                                .title(supply.getString("Building"))
+                                .title("Supply")
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     }
                 }
@@ -77,7 +79,7 @@ public final class Utils {
         return googleMap;
     }
 
-    public static GoogleMap showRequestsInMap(final GoogleMap googleMap, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
+    public static GoogleMap showRequestsInMap(final GoogleMap googleMap, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient, Context context) {
         ParseQuery <ParseObject> query = ParseQuery.getQuery("request");
         query.whereDoesNotExist("isCompleted");
         query.findInBackground(new FindCallback<ParseObject>() {
@@ -90,10 +92,63 @@ public final class Utils {
                         addGeofence(requestLocation, RADIUS, geofenceHelper, geofencingClient);
                         addCircle(requestLocation, RADIUS, googleMap);
 
-                        googleMap.addMarker(new MarkerOptions()
+
+                        Marker requestMarker = googleMap.addMarker(new MarkerOptions()
                                 .position(requestLocation)
-                                .title(uncompletedRequest.getString("Building"))
+                                .title("Request " + geofences.indexOf(uncompletedRequest))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET)));
+
+
+
+                        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                            @Override
+                            public boolean onMarkerClick(@NonNull Marker marker) {
+                                String[] stringsIndex = marker.getTitle().split(" ");
+                                if (stringsIndex[0].equals("Request")) {
+                                    View messageView = LayoutInflater.from(context).inflate(R.layout.view_request_item, null);
+                                    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                                    alertDialogBuilder.setView(messageView);
+
+                                    TextView building = messageView.findViewById(R.id.tvViewBuilding);
+                                    TextView productType = messageView.findViewById(R.id.tvViewProductType);
+                                    String tvBuilding = geofences.get(Integer.parseInt(stringsIndex[1])).getString("building");
+                                    String tvProductType = geofences.get(Integer.parseInt(stringsIndex[1])).getString("productType");
+                                    building.setText(tvBuilding);
+                                    productType.setText(tvProductType);
+
+                                   /* ParseQuery <ParseObject> query = ParseQuery.getQuery("request");
+                                    query.whereEqualTo("location", new ParseGeoPoint(requestMarker.getPosition().latitude, requestMarker.getPosition().longitude));
+                                    query.findInBackground(new FindCallback <ParseObject> () {
+                                        @Override public void done(List <ParseObject> requests, ParseException e) {
+                                            if (e == null) {
+                                                String tvBuilding = requests.get(0).getString("building");
+                                                building.setText(tvBuilding);
+                                                Log.i(TAG, "array: " + requests.toString());
+                                            }
+                                            Log.i(TAG, "array: " + requests.toString());
+                                        }
+                                    });*/
+
+                                    final AlertDialog alertDialog = alertDialogBuilder.create();
+
+                                    alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+                                            new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+
+                                                }
+                                            });
+
+                                    alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+                                            });
+
+                                    alertDialog.show();
+                                }
+                                return true;
+                            }
+                        });
                     }
                 }
             }
@@ -153,7 +208,7 @@ public final class Utils {
         }
     }
 
-    public static void showAlertDialogForRequest(Context context, final LatLng point, GoogleMap googleMap, Request request, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
+    public static void showAlertDialogToMakeRequest(Context context, final LatLng point, GoogleMap googleMap, Request request, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
         View messageView = LayoutInflater.from(context).inflate(R.layout.log_request_item, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setView(messageView);
@@ -164,7 +219,6 @@ public final class Utils {
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        BitmapDescriptor defaultMarker = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN);
                         String requestBuilding = ((EditText) alertDialog.findViewById(R.id.etBuilding)).getText().toString();
                         request.setRequestBuilding(requestBuilding);
                         String requestProductType = ((EditText) alertDialog.findViewById(R.id.etProductType)).getText().toString();

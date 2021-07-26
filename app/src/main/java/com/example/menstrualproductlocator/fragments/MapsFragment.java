@@ -3,6 +3,7 @@ package com.example.menstrualproductlocator.fragments;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -11,6 +12,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
@@ -21,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.result.contract.ActivityResultContracts.*;
@@ -40,6 +43,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.parse.ParseUser;
@@ -67,13 +72,14 @@ public class MapsFragment extends Fragment {
         public void onMapReady(GoogleMap googleMap) {
             geofencingClient = LocationServices.getGeofencingClient(getContext());
             geofenceHelper = new GeofenceHelper(getContext());
-
             map = googleMap;
+            googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.style_json));
+
             Utils.getCurrentUserLocation(getActivity(), locationManager);
             Utils.saveCurrentUserLocation(getActivity(), locationManager);
             Utils.showCurrentUserInMap(map, getActivity(), locationManager);
             Utils.showSuppliesInMap(map);
-            Utils.showRequestsInMap(map, geofenceHelper, geofencingClient);
+            Utils.showRequestsInMap(map, geofenceHelper, geofencingClient, getContext());
 
             if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 enableUserLocation();
@@ -103,7 +109,7 @@ public class MapsFragment extends Fragment {
                         if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             Request request = new Request();
                             request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
-                            Utils.showAlertDialogForRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
+                            Utils.showAlertDialogToMakeRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
                         } else {
                             if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
                                 ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, REQUEST_BACKGROUND_LOCATION);
@@ -114,7 +120,7 @@ public class MapsFragment extends Fragment {
                     } else {
                         Request request = new Request();
                         request.setRequestLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
-                        Utils.showAlertDialogForRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
+                        Utils.showAlertDialogToMakeRequest(getContext(), request.getRequestLatLng(), map, request, geofenceHelper, geofencingClient);
                     }
 
                 }
