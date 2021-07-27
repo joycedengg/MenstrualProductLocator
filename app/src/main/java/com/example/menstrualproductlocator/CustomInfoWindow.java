@@ -18,23 +18,17 @@ public class CustomInfoWindow implements GoogleMap.InfoWindowAdapter {
         inflater = i;
     }
 
-    // This defines the contents within the info window based on the marker
     @Override
     public View getInfoContents(Marker marker) {
-        // Getting view from the layout file
         View view = inflater.inflate(R.layout.custom_info_window, null);
-        // Populate fields
         TextView building = (TextView) view.findViewById(R.id.tvSupplyBuilding);
         building.setText(marker.getTitle());
 
         TextView productType = (TextView) view.findViewById(R.id.tvSupplyProductType);
-//        productType.setText(marker.getSnippet());
-        // Return info window contents
+        productType.setText(marker.getSnippet());
         return view;
     }
 
-    // This changes the frame of the info window; returning null uses the default frame.
-    // This is just the border and arrow surrounding the contents specified above
     @Override
     public View getInfoWindow(Marker marker) {
         return null;
