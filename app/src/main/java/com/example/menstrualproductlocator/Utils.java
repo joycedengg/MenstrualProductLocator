@@ -51,6 +51,7 @@ public final class Utils {
     public static final int REQUEST_LOCATION = 1;
     public static String ID = "ID";
     public static final int RADIUS = 100; //goefence radius is 50m
+    public static Circle circle;
 
     private Utils() {
         throw new UnsupportedOperationException("Utility class shouldn't be instantiated");
@@ -69,7 +70,8 @@ public final class Utils {
 
                         googleMap.addMarker(new MarkerOptions()
                                 .position(supplyLocation)
-                                .title("Supply")
+                                .title(supply.getString("building"))
+//                                .snippet(supply.getString("productType"))
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)));
                     }
                 }
@@ -120,12 +122,12 @@ public final class Utils {
                                             new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
+                                                    marker.remove();
                                                     try {
                                                         geofences.get(Integer.parseInt(stringsIndex[1])).delete();
                                                     } catch (ParseException parseException) {
                                                         parseException.printStackTrace();
                                                     }
-                                                    marker.remove();
                                                 }
                                             });
 
@@ -156,7 +158,7 @@ public final class Utils {
         circleOptions.strokeColor(Color.argb(255, 255, 0 ,0));
         circleOptions.fillColor(Color.argb(64, 255, 0 ,0));
         circleOptions.strokeWidth(4);
-        map.addCircle(circleOptions);
+        circle = map.addCircle(circleOptions);
     }
 
     public static void showCurrentUserInMap(final GoogleMap googleMap, Activity activity, LocationManager locationManager) {
@@ -164,11 +166,6 @@ public final class Utils {
         ParseGeoPoint currentUserLocation = getCurrentUserLocation(activity, locationManager);
 
         LatLng currentUser = new LatLng(currentUserLocation.getLatitude(), currentUserLocation.getLongitude());
-        googleMap.addMarker(new MarkerOptions()
-                .position(currentUser)
-                .title(ParseUser.getCurrentUser().getUsername())
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
-
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUser, ZOOM_SCALE));
     }
 
@@ -191,6 +188,7 @@ public final class Utils {
                 ParseGeoPoint currentUserLocation = new ParseGeoPoint(location.getLatitude(), location.getLongitude());
                 ParseUser currentUser = ParseUser.getCurrentUser();
 
+                //commented out for running purposes
 //                if (currentUser != null) {
 //                    currentUser.put("userLocation", currentUserLocation);
 //                    currentUser.saveInBackground();
