@@ -1,6 +1,11 @@
 package com.example.menstrualproductlocator.fragments;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
@@ -11,9 +16,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.menstrualproductlocator.R;
 import com.google.android.material.textfield.TextInputLayout;
@@ -26,6 +35,7 @@ public class FindNearestSupplyFragment extends DialogFragment {
 
     TextInputLayout tilSearchBuilding;
     AutoCompleteTextView actSearchBuilding;
+    ProgressBar progressBar;
 
     public FindNearestSupplyFragment() {
 
@@ -44,6 +54,9 @@ public class FindNearestSupplyFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         tilSearchBuilding = (TextInputLayout) view.findViewById(R.id.tilSearchBuilding);
         actSearchBuilding = (AutoCompleteTextView) view.findViewById(R.id.actSearchBuilding);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
+        progressBar.setVisibility(View.INVISIBLE);
 
         ArrayList<String> buildings = new ArrayList<>();
         buildings.add("CULC");
@@ -65,6 +78,31 @@ public class FindNearestSupplyFragment extends DialogFragment {
         ArrayAdapter<String> buildingsAdapter = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, buildings);
         actSearchBuilding.setAdapter(buildingsAdapter);
         actSearchBuilding.setThreshold(1);
+
+        actSearchBuilding.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(getContext(), "Building: " + buildings.get(position), Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.VISIBLE);
+
+                ValueAnimator animator = ValueAnimator.ofInt(0, progressBar.getMax());
+                animator.setDuration(1000);
+                animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation){
+                        progressBar.setProgress((Integer)animation.getAnimatedValue());
+                    }
+                });
+                animator.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        super.onAnimationEnd(animation);
+                        FindNearestSupplyFragment.super.dismiss();
+                    }
+                });
+                animator.start();
+            }
+        });
 
     }
 
