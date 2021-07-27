@@ -28,6 +28,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.result.contract.ActivityResultContracts.*;
+import androidx.fragment.app.FragmentManager;
 
 import com.example.menstrualproductlocator.CustomInfoWindow;
 import com.example.menstrualproductlocator.GeofenceBroadcastReceiver;
@@ -67,6 +68,7 @@ public class MapsFragment extends Fragment {
     private FragmentMapsBinding binding;
     private Button btnLogSupply;
     private Button btnRequestProduct;
+    private Button btnFindNearestSupply;
     public static final String TAG = "Map Fragment";
     private GeofencingClient geofencingClient;
     LocationManager locationManager;
@@ -115,6 +117,14 @@ public class MapsFragment extends Fragment {
                     supply.setSupplyLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
                     supply.saveInBackground();
                     Utils.showSuppliesInMap(map);
+                }
+            });
+
+            btnFindNearestSupply.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    showFindNearestSupplyDialog();
+                    Toast.makeText(getContext(), "Nearest supply is: " , Toast.LENGTH_SHORT).show();
                 }
             });
             btnRequestProduct.setOnClickListener(new View.OnClickListener() {
@@ -175,6 +185,7 @@ public class MapsFragment extends Fragment {
 
         btnLogSupply = binding.btnLogSupply;
         btnRequestProduct = binding.btnRequestProduct;
+        btnFindNearestSupply = binding.btnFindNearestSupply;
 
         geofencingClient = LocationServices.getGeofencingClient(getContext());
         return view;
@@ -195,4 +206,11 @@ public class MapsFragment extends Fragment {
             enableUserLocation();
         }
     });
+
+    private void showFindNearestSupplyDialog() {
+        FragmentManager fm = getFragmentManager();
+        FindNearestSupplyFragment findNearestSupplyFragment = FindNearestSupplyFragment.newInstance("Some Title");
+        findNearestSupplyFragment.setTargetFragment(MapsFragment.this, 300);
+        findNearestSupplyFragment.show(fm, "fragment_edit_name");
+    }
 }

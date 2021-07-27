@@ -37,4 +37,13 @@
         android:layout_marginEnd="12dp"
         android:layout_toStartOf="@+id/btnLogSupply"
         android:text="request a product" />
+
+    <Button
+        android:id="@+id/btnFindNearestSupply"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnRequestProduct"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:text="find nearest supply" />
 </RelativeLayout>

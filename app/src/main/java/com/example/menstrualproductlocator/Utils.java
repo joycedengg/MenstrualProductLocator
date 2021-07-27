@@ -3,6 +3,7 @@ package com.example.menstrualproductlocator;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +14,8 @@ import android.location.LocationManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -34,6 +37,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.textfield.TextInputLayout;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseGeoPoint;
@@ -226,6 +230,52 @@ public final class Utils {
 
         alertDialog.show();
     }
+
+//    public static void showAlertDialogToFindNearestSupply(Context context, GoogleMap googleMap, Activity activity) {
+//        View messageView = LayoutInflater.from(context).inflate(R.layout.find_nearest_supply_item, null);
+//        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+//        alertDialogBuilder.setView(messageView);
+//
+//        final AlertDialog alertDialog = alertDialogBuilder.create();
+//        TextInputLayout tilSearchBuilding = (TextInputLayout) alertDialog.findViewById(R.id.tilSearchBuilding);
+//        AutoCompleteTextView actSearchBuilding = (AutoCompleteTextView) alertDialog.findViewById(R.id.actSearchBuilding);
+//
+//        ArrayList<String> buildings = new ArrayList<>();
+//        buildings.add("CULC");
+//        buildings.add("McCamish Arena");
+//        buildings.add("Scheller College of Business");
+//        buildings.add("Klaus College of Computing");
+//        buildings.add("Van Leer Engineering Building");
+//        buildings.add("Kendeda");
+//        buildings.add("GTRI North");
+//        buildings.add("West Village Dining Hall");
+//        buildings.add("Campus Recreation Center");
+//        buildings.add("Stamps Health Center");
+//        buildings.add("Exhibition Hall");
+//        buildings.add("Ferst Center for the Arts");
+//        buildings.add("Tech Tower");
+//        buildings.add("GT Library");
+//        buildings.add("North Avenue Dining Hall");
+//
+//        ArrayAdapter<String> buildingsAdapter = new ArrayAdapter<>(activity.getApplicationContext(), R.layout.support_simple_spinner_dropdown_item, buildings);
+//        actSearchBuilding.setAdapter(buildingsAdapter);
+//        actSearchBuilding.setThreshold(1);
+//
+//        alertDialog.setButton(DialogInterface.BUTTON_POSITIVE, "OK",
+//                new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//
+//                    }
+//                });
+//
+//        alertDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel",
+//                new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) { dialog.cancel(); }
+//                });
+//
+//        alertDialog.show();
+//    }
 
     @SuppressLint("MissingPermission")
     public static void addGeofence(LatLng locaton, float radius, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
