@@ -29,6 +29,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.contract.ActivityResultContracts.*;
 
+import com.example.menstrualproductlocator.CustomInfoWindow;
 import com.example.menstrualproductlocator.GeofenceBroadcastReceiver;
 import com.example.menstrualproductlocator.GeofenceHelper;
 import com.example.menstrualproductlocator.R;
@@ -85,6 +86,7 @@ public class MapsFragment extends Fragment {
             fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(getContext());
             geofenceHelper = new GeofenceHelper(getContext());
             map = googleMap;
+            googleMap.setInfoWindowAdapter(new CustomInfoWindow(getLayoutInflater()));
             googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(getContext(), R.raw.style_json));
 
             Utils.getCurrentUserLocation(getActivity(), locationManager);
