@@ -120,7 +120,12 @@ public final class Utils {
                                             new DialogInterface.OnClickListener() {
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-
+                                                    try {
+                                                        geofences.get(Integer.parseInt(stringsIndex[1])).delete();
+                                                    } catch (ParseException parseException) {
+                                                        parseException.printStackTrace();
+                                                    }
+                                                    marker.remove();
                                                 }
                                             });
 

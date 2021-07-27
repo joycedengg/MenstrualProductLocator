@@ -4,6 +4,10 @@ import android.app.Application;
 
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.livequery.ParseLiveQueryClient;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 public class ParseApplication extends Application {
@@ -20,5 +24,7 @@ public class ParseApplication extends Application {
                 .clientKey(getString(R.string.back4app_client_key))
                 .server(getString(R.string.back4app_server_url))
                 .build());
+
+        ParseLiveQueryClient parseLiveQueryClient = null;
     }
 }
