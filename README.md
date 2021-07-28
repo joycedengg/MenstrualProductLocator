@@ -41,15 +41,16 @@ Your app integrates with at least one SDK (e.g. Google Maps SDK, Facebook SDK) o
     * Google Maps SKD
     
 Your app uses at least one gesture (e.g. double tap to like, e.g. pinch to scale) 
-    * Pinch to scale map
+    * Swiping between fragments
     
 Your app uses at least one animation (e.g. fade in/out, e.g. animating a view growing and shrinking)
-    * MotionLayout
+    * Fragments sliding in
     
 Your app incorporates at least external library to add visual polish
     * MotionLayout
     
 Your app provides opportunities for you to overcome difficult/ambiguous technical problems
+    * 
 
 -------------
 
@@ -61,13 +62,11 @@ Your app provides opportunities for you to overcome difficult/ambiguous technica
 * User can locate the most nearby products
 
 **Optional Nice-to-have Stories**
+* User is notified when they get close to another user who needs a product
 * User can accept another user's request for a product
-* User can view discounts on menstrual products offered in nearby pharmacies or grocery stores
-* User can learn about more sustainable menstrual products
 * User can chat with other users in an app-wide chat
+* User can find nearest supply based on their location
 * User can text the other user to commmunicate where to drop off the product
-* User can earn exp points for logging free products
-* User can see their exp level
 
 ### 2. Screen Archetypes
 
