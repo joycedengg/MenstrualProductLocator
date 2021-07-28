@@ -3,33 +3,32 @@ package com.example.menstrualproductlocator.fragments;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.menstrualproductlocator.R;
 import com.google.android.material.textfield.TextInputLayout;
-
-import org.w3c.dom.Text;
+import com.example.menstrualproductlocator.NearestSupplyAlgorithm.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class FindNearestSupplyFragment extends DialogFragment {
 
@@ -82,15 +81,17 @@ public class FindNearestSupplyFragment extends DialogFragment {
         actSearchBuilding.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getContext(), "Building: " + buildings.get(position), Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Building: " + buildingsAdapter.getItem(position) + position, Toast.LENGTH_SHORT).show();
+                Bundle bundle = new Bundle();
+                bundle.putInt("index", position);
                 progressBar.setVisibility(View.VISIBLE);
 
                 ValueAnimator animator = ValueAnimator.ofInt(0, progressBar.getMax());
                 animator.setDuration(1000);
                 animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
-                    public void onAnimationUpdate(ValueAnimator animation){
-                        progressBar.setProgress((Integer)animation.getAnimatedValue());
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        progressBar.setProgress((Integer) animation.getAnimatedValue());
                     }
                 });
                 animator.addListener(new AnimatorListenerAdapter() {
@@ -98,7 +99,9 @@ public class FindNearestSupplyFragment extends DialogFragment {
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
                         FindNearestSupplyFragment.super.dismiss();
-                    }
+                        FoundNearestSupplyFragment foundNearestSupplyFragment = new FoundNearestSupplyFragment();
+                        foundNearestSupplyFragment.setArguments(bundle);
+                        foundNearestSupplyFragment.show(getFragmentManager(), "fragment_edit_name");                    }
                 });
                 animator.start();
             }
@@ -110,5 +113,25 @@ public class FindNearestSupplyFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_find_nearest_supply, container, false);
+    }
+
+    public static ArrayList<String> getArray() {
+        ArrayList<String> buildings = new ArrayList<>();
+        buildings.add("CULC");
+        buildings.add("McCamish Arena");
+        buildings.add("Scheller College of Business");
+        buildings.add("Klaus College of Computing");
+        buildings.add("Van Leer Engineering Building");
+        buildings.add("Kendeda");
+        buildings.add("GTRI North");
+        buildings.add("West Village Dining Hall");
+        buildings.add("Campus Recreation Center");
+        buildings.add("Stamps Health Center");
+        buildings.add("Exhibition Hall");
+        buildings.add("Ferst Center for the Arts");
+        buildings.add("Tech Tower");
+        buildings.add("GT Library");
+        buildings.add("North Avenue Dining Hall");
+        return buildings;
     }
 }

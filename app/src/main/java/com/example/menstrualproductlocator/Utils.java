@@ -54,7 +54,7 @@ public final class Utils {
     public static final String TAG = "utils";
     public static final int REQUEST_LOCATION = 1;
     public static String ID = "ID";
-    public static final int RADIUS = 100; //goefence radius is 50m
+    public static final int RADIUS = 50; //goefence radius is 50m
     public static Circle circle;
 
     private Utils() {

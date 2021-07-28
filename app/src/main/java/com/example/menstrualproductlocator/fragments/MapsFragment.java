@@ -74,8 +74,8 @@ public class MapsFragment extends Fragment {
     LocationManager locationManager;
     private static final int REQUEST_LOCATION = 1;
     private static final int REQUEST_BACKGROUND_LOCATION = 2;
-    public static final int RADIUS = 100;
-    private GoogleMap map;
+    public static final int RADIUS = 50;
+    public GoogleMap map;
     private GeofenceHelper geofenceHelper;
     private FusedLocationProviderClient fusedLocationProviderClient;
 
