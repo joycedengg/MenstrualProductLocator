@@ -61,6 +61,12 @@ public final class Utils {
         throw new UnsupportedOperationException("Utility class shouldn't be instantiated");
     }
 
+    /**
+     * Displays markers on the map corresponding to supplies in Parse
+     *
+     * @param googleMap map that the markers are being added to
+     * @return the map that is being edited
+     */
     public static GoogleMap showSuppliesInMap(final GoogleMap googleMap) {
         ParseQuery <ParseObject> query = ParseQuery.getQuery("supply");
         query.whereExists("location");
@@ -85,6 +91,12 @@ public final class Utils {
         return googleMap;
     }
 
+    /**
+     * Displays markers on the map corresponding to requests in Parse
+     *
+     * @param googleMap map that the markers are being added to
+     * @return the map that is being edited
+     */
     public static GoogleMap showRequestsInMap(final GoogleMap googleMap, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient, Context context) {
         ParseQuery <ParseObject> query = ParseQuery.getQuery("request");
         query.whereDoesNotExist("isCompleted");
@@ -154,7 +166,13 @@ public final class Utils {
         return googleMap;
     }
 
-
+    /**
+     * Adds a red circle on the map to visualize a geofence
+     *
+     * @param location geofence's location
+     * @param radius geofence's radius
+     * @param map map that the circle is being added to
+     */
     public static void addCircle(LatLng location, float radius, GoogleMap map) {
         CircleOptions circleOptions = new CircleOptions();
         circleOptions.center(location);
@@ -165,6 +183,13 @@ public final class Utils {
         circle = map.addCircle(circleOptions);
     }
 
+    /**
+     * Zooms the map onto the user's current location
+     *
+     * @param googleMap map that is being zoomed on
+     * @param activity activity that the method is being called in
+     * @param locationManager LocationManager being used to access user's location
+     */
     public static void showCurrentUserInMap(final GoogleMap googleMap, Activity activity, LocationManager locationManager) {
         int ZOOM_SCALE = 18; //18 is the zoom scope level since it zooms close enough to place building titles on the map
         ParseGeoPoint currentUserLocation = getCurrentUserLocation(activity, locationManager);
@@ -173,12 +198,25 @@ public final class Utils {
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentUser, ZOOM_SCALE));
     }
 
+    /**
+     * Returns the user's current location
+     *
+     * @param activity Activity being called in
+     * @param locationManager LocationManager being used ot access user's location
+     * @return user's current location as a ParseGeoPoint
+     */
     public static ParseGeoPoint getCurrentUserLocation(Activity activity, LocationManager locationManager) {
         ParseUser currentUser = ParseUser.getCurrentUser();
         saveCurrentUserLocation(activity, locationManager);
         return currentUser.getParseGeoPoint("userLocation");
     }
 
+    /**
+     * Asks user for location permissions, retrieves user's current location, then saves it in Parse
+     *
+     * @param activity Activity being called in
+     * @param locationManager LocationManager being used ot access user's location
+     */
     public static void saveCurrentUserLocation(Activity activity, LocationManager locationManager) {
         boolean hasNoFineLocationPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
         boolean hasNoCoarseLocationPermission = ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
@@ -201,6 +239,16 @@ public final class Utils {
         }
     }
 
+    /**
+     * Displays an AlertDialog to log a request on the map, activates Geofence, and shows a marker on the map
+     *
+     * @param context
+     * @param point
+     * @param googleMap
+     * @param request
+     * @param geofenceHelper
+     * @param geofencingClient
+     */
     public static void showAlertDialogToMakeRequest(Context context, final LatLng point, GoogleMap googleMap, Request request, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
         View messageView = LayoutInflater.from(context).inflate(R.layout.log_request_item, null);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
@@ -231,6 +279,14 @@ public final class Utils {
         alertDialog.show();
     }
 
+    /**
+     * Activates a Geofence around a request
+     *
+     * @param locaton Geofence's location
+     * @param radius Geofence's radius
+     * @param geofenceHelper Stores geofences, adds them to the Google API, and informs about the status of the operation.
+     * @param geofencingClient Geofencing client used to add the geofence
+     */
     @SuppressLint("MissingPermission")
     public static void addGeofence(LatLng locaton, float radius, GeofenceHelper geofenceHelper, GeofencingClient geofencingClient) {
         Geofence geofence = geofenceHelper.getGeofence(ID, locaton, radius,Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL);
