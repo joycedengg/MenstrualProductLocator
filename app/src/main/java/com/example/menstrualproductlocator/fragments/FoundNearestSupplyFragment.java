@@ -25,6 +25,8 @@ import com.example.menstrualproductlocator.R;
 import com.example.menstrualproductlocator.fragments.FindNearestSupplyFragment;
 import com.google.android.material.textfield.TextInputLayout;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -34,6 +36,8 @@ public class FoundNearestSupplyFragment extends DialogFragment {
 
     TextView tvNearestSupply;
     TextView tvFoundSupplyTitle;
+    TextView tvFoundSupplyTitle2;
+    TextView tvWalkingTime;
 
     public FoundNearestSupplyFragment() {
 
@@ -52,11 +56,20 @@ public class FoundNearestSupplyFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         tvNearestSupply = (TextView) view.findViewById(R.id.tvNearestSupply);
         tvFoundSupplyTitle = (TextView) view.findViewById(R.id.tvFoundSupplyTitle);
+        tvFoundSupplyTitle2 = (TextView) view.findViewById(R.id.tvFoundSupplyTitle2);
+        tvWalkingTime = (TextView) view.findViewById(R.id.tvWalkingTime);
+
         Bundle bundle = this.getArguments();
-        int index = bundle.getInt("index");
-        index += 65;
-        char vertex = (char)index;
-        tvNearestSupply.setText(FindNearestSupply.returnMap(new Vertex<>(vertex), createGraph()));
+        int selectedIndex = bundle.getInt("index");
+        selectedIndex += 65;
+        char selectedVertex = (char)selectedIndex;
+
+        Vertex<Character> shortestVertex = FindNearestSupply.getShortestVertex(new Vertex<>(selectedVertex), createGraph());
+        char shortestVertexChar = shortestVertex.getData();
+        int resultingIndex = shortestVertexChar - 65;
+        ArrayList<String> buildings = FindNearestSupplyFragment.getArray();
+        tvNearestSupply.setText(buildings.get(resultingIndex));
+        tvWalkingTime.setText(FindNearestSupply.getShortestWalkingTime(new Vertex<>(selectedVertex), createGraph()));
     }
 
     public Graph<Character> createGraph() {
@@ -147,33 +160,6 @@ public class FoundNearestSupplyFragment extends DialogFragment {
         edges.add(new Edge<>(new Vertex<>('L'), new Vertex<>('K'), 5));
         edges.add(new Edge<>(new Vertex<>('M'), new Vertex<>('K'), 12));
         edges.add(new Edge<>(new Vertex<>('K'), new Vertex<>('M'), 12));
-
-        return new Graph<Character>(vertices, edges);
-    }
-
-    private Graph<Character> createUndirectedGraph() {
-        Set<Vertex<Character>> vertices = new HashSet<>();
-        for (int i = 65; i <= 70; i++) {
-            vertices.add(new Vertex<Character>((char) i));
-        }
-
-        Set<Edge<Character>> edges = new LinkedHashSet<>();
-        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('B'), 7));
-        edges.add(new Edge<>(new Vertex<>('B'), new Vertex<>('A'), 7));
-        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('C'), 5));
-        edges.add(new Edge<>(new Vertex<>('C'), new Vertex<>('A'), 5));
-        edges.add(new Edge<>(new Vertex<>('C'), new Vertex<>('D'), 2));
-        edges.add(new Edge<>(new Vertex<>('D'), new Vertex<>('C'), 2));
-        edges.add(new Edge<>(new Vertex<>('A'), new Vertex<>('D'), 4));
-        edges.add(new Edge<>(new Vertex<>('D'), new Vertex<>('A'), 4));
-        edges.add(new Edge<>(new Vertex<>('D'), new Vertex<>('E'), 1));
-        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('D'), 1));
-        edges.add(new Edge<>(new Vertex<>('B'), new Vertex<>('E'), 3));
-        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('B'), 3));
-        edges.add(new Edge<>(new Vertex<>('B'), new Vertex<>('F'), 8));
-        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('B'), 8));
-        edges.add(new Edge<>(new Vertex<>('E'), new Vertex<>('F'), 6));
-        edges.add(new Edge<>(new Vertex<>('F'), new Vertex<>('E'), 6));
 
         return new Graph<Character>(vertices, edges);
     }

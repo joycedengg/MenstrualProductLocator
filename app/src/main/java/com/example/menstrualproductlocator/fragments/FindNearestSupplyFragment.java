@@ -58,24 +58,7 @@ public class FindNearestSupplyFragment extends DialogFragment {
 
         progressBar.setVisibility(View.INVISIBLE);
 
-        ArrayList<String> buildings = new ArrayList<>();
-        buildings.add("CULC");
-        buildings.add("McCamish Arena");
-        buildings.add("Scheller College of Business");
-        buildings.add("Klaus College of Computing");
-        buildings.add("Van Leer Engineering Building");
-        buildings.add("Kendeda");
-        buildings.add("GTRI North");
-        buildings.add("West Village Dining Hall");
-        buildings.add("Campus Recreation Center");
-        buildings.add("Stamps Health Center");
-        buildings.add("Exhibition Hall");
-        buildings.add("Ferst Center for the Arts");
-        buildings.add("Tech Tower");
-        buildings.add("GT Library");
-        buildings.add("North Avenue Dining Hall");
-
-        ArrayAdapter<String> buildingsAdapter = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, buildings);
+        ArrayAdapter<String> buildingsAdapter = new ArrayAdapter<>(getContext(), R.layout.support_simple_spinner_dropdown_item, getArray());
         actSearchBuilding.setAdapter(buildingsAdapter);
         actSearchBuilding.setThreshold(1);
 

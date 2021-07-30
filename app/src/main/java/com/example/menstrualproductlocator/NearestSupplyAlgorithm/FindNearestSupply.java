@@ -42,8 +42,28 @@ public class FindNearestSupply {
         return map;
     }
 
-    public static <T> String returnMap(Vertex<T> start,
+    public static <T> String getShortestWalkingTime(Vertex<T> start,
                                        Graph<T> graph) {
-        return FindNearestSupply(start, graph).toString();
+        Map<Vertex<T>, Integer> map = FindNearestSupply(start, graph);
+        map.remove(start);
+        Map.Entry<Vertex<T>, Integer> minDistance = null;
+        for (Map.Entry<Vertex<T>, Integer> entry : map.entrySet()) {
+            if (minDistance == null || minDistance.getValue() > entry.getValue()) {
+                minDistance = entry;
+            }
+        }
+        return minDistance.getValue().toString();
+    }
+
+    public static <T> Vertex<T> getShortestVertex(Vertex<T> start, Graph<T> graph) {
+        Map<Vertex<T>, Integer> map = FindNearestSupply(start, graph);
+        map.remove(start);
+        Map.Entry<Vertex<T>, Integer> minDistance = null;
+        for (Map.Entry<Vertex<T>, Integer> entry : map.entrySet()) {
+            if (minDistance == null || minDistance.getValue() > entry.getValue()) {
+                minDistance = entry;
+            }
+        }
+        return minDistance.getKey();
     }
 }
