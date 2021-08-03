@@ -1,19 +1,16 @@
 package com.example.menstrualproductlocator.fragments;
 
 import androidx.activity.result.ActivityResultLauncher;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -23,15 +20,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.result.contract.ActivityResultContracts.*;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.menstrualproductlocator.CustomInfoWindow;
-import com.example.menstrualproductlocator.GeofenceBroadcastReceiver;
 import com.example.menstrualproductlocator.GeofenceHelper;
 import com.example.menstrualproductlocator.R;
 import com.example.menstrualproductlocator.Supply;
@@ -39,10 +36,7 @@ import com.example.menstrualproductlocator.Request;
 import com.example.menstrualproductlocator.Utils;
 import com.example.menstrualproductlocator.databinding.FragmentMapsBinding;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -50,25 +44,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.parse.ParseUser;
-import com.parse.livequery.ParseLiveQueryClient;
-import com.parse.livequery.SubscriptionHandling;
-
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MapsFragment extends Fragment {
 
     private FragmentMapsBinding binding;
-    private Button btnLogSupply;
-    private Button btnRequestProduct;
-    private Button btnFindNearestSupply;
     public static final String TAG = "Map Fragment";
     private GeofencingClient geofencingClient;
     LocationManager locationManager;
@@ -78,6 +61,11 @@ public class MapsFragment extends Fragment {
     public GoogleMap map;
     private GeofenceHelper geofenceHelper;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private FloatingActionButton floatingActionMenu;
+    private FloatingActionButton btnRequest;
+    private FloatingActionButton btnLog;
+    private FloatingActionButton btnFindNearestSupply;
+    private boolean clicked = false;
 
 
     private OnMapReadyCallback callback = new OnMapReadyCallback() {
@@ -109,7 +97,14 @@ public class MapsFragment extends Fragment {
                 }
             }
 
-            btnLogSupply.setOnClickListener(new View.OnClickListener() {
+            floatingActionMenu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    onFABclick();
+                }
+            });
+
+            btnLog.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Supply supply = new Supply();
@@ -124,10 +119,9 @@ public class MapsFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     showFindNearestSupplyDialog();
-                    Toast.makeText(getContext(), "Nearest supply is: " , Toast.LENGTH_SHORT).show();
                 }
             });
-            btnRequestProduct.setOnClickListener(new View.OnClickListener() {
+            btnRequest.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (Build.VERSION.SDK_INT >= 29) {
@@ -164,6 +158,60 @@ public class MapsFragment extends Fragment {
         }
     };
 
+    private void onFABclick() {
+        setVisibility(clicked);
+        setAnimation(clicked);
+        setClickable(clicked);
+        if (!clicked) {
+            clicked = true;
+        } else {
+            clicked = false;
+        }
+    }
+
+    private void setVisibility(boolean clicked) {
+        if (!clicked) {
+            btnRequest.setVisibility(View.VISIBLE);
+            btnLog.setVisibility(View.VISIBLE);
+            btnFindNearestSupply.setVisibility(View.VISIBLE);
+        } else {
+            btnRequest.setVisibility(View.INVISIBLE);
+            btnLog.setVisibility(View.INVISIBLE);
+            btnFindNearestSupply.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setAnimation(boolean clicked) {
+        Animation fromBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.from_bottom_anim);
+        Animation rotateOpen = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_open_anim);
+        Animation toBottom = AnimationUtils.loadAnimation(getActivity(), R.anim.to_bottom_anim);
+        Animation rotateClose = AnimationUtils.loadAnimation(getActivity(), R.anim.rotate_close_anim);
+        if (!clicked) {
+            btnRequest.startAnimation(fromBottom);
+            btnLog.startAnimation(fromBottom);
+            btnFindNearestSupply.startAnimation(fromBottom);
+            floatingActionMenu.startAnimation(rotateOpen);
+        } else {
+            btnRequest.startAnimation(toBottom);
+            btnLog.startAnimation(toBottom);
+            btnFindNearestSupply.startAnimation(toBottom);
+            floatingActionMenu.startAnimation(rotateClose);
+        }
+    }
+
+    private void setClickable(boolean clicked) {
+        if (!clicked) {
+            btnRequest.setClickable(true);
+            btnLog.setClickable(true);
+            btnFindNearestSupply.setClickable(true);
+        } else {
+            btnRequest.setClickable(false);
+            btnRequest.setClickable(false);
+            btnRequest.setClickable(false);
+
+        }
+    }
+
     @SuppressLint("MissingPermission")
     private void enableUserLocation() {
         Task<Location> locationTask = fusedLocationProviderClient.getLastLocation();
@@ -183,9 +231,11 @@ public class MapsFragment extends Fragment {
         binding = FragmentMapsBinding.inflate(getLayoutInflater(), container, false);
         View view = binding.getRoot();
 
-        btnLogSupply = binding.btnLogSupply;
-        btnRequestProduct = binding.btnRequestProduct;
+        floatingActionMenu = binding.floatingActionMenu;
+        btnRequest = binding.btnRequest;
+        btnLog = binding.btnLog;
         btnFindNearestSupply = binding.btnFindNearestSupply;
+
 
         geofencingClient = LocationServices.getGeofencingClient(getContext());
         return view;

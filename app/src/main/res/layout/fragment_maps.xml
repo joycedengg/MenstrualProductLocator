@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,34 +17,63 @@
         android:layout_marginTop="0dp"
         tools:context=".fragments.MapsFragment" />
 
-    <Button
-        android:id="@+id/btnLogSupply"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="30dp"
-        android:text="log a supply" />
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="27dp"
+        android:layout_marginBottom="28dp"
+        android:clickable="true"
+        android:tint="@android:color/white"
+        android:focusable="true"
+        android:backgroundTint="@color/purple_500"
+        app:srcCompat="@drawable/ic_add" />
 
-    <Button
-        android:id="@+id/btnRequestProduct"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:backgroundTint="@color/white"
+        android:visibility="invisible"
+        android:id="@+id/btnRequest"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="29dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="12dp"
-        android:layout_toStartOf="@+id/btnLogSupply"
-        android:text="request a product" />
+        android:layout_above="@+id/floatingActionMenu"
+        android:layout_alignEnd="@+id/floatingActionMenu"
+        android:layout_marginEnd="1dp"
+        android:layout_marginBottom="21dp"
+        android:clickable="true"
+        android:tint="@android:color/white"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_request" />
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:backgroundTint="@color/white"
+        android:visibility="invisible"
+        android:id="@+id/btnLog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/btnRequest"
+        android:layout_alignEnd="@+id/btnRequest"
+        android:layout_marginEnd="0dp"
+        android:layout_marginBottom="21dp"
+        android:clickable="true"
+        android:tint="@android:color/white"
+        android:text="Most Popular"
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_log" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:backgroundTint="@color/white"
+        android:visibility="invisible"
         android:id="@+id/btnFindNearestSupply"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btnRequestProduct"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="11dp"
-        android:text="find nearest supply" />
+        android:layout_above="@+id/btnLog"
+        android:layout_alignEnd="@+id/btnLog"
+        android:layout_marginEnd="-3dp"
+        android:layout_marginBottom="18dp"
+        android:tint="@android:color/white"
+        android:focusable="true"
+        android:clickable="true"
+        app:srcCompat="@drawable/ic_find" />
 </RelativeLayout>

@@ -83,6 +83,7 @@ public class FindNearestSupplyFragment extends DialogFragment {
                     public void onAnimationEnd(Animator animation) {
                         super.onAnimationEnd(animation);
                         FindNearestSupplyFragment.super.dismiss();
+                        dismiss();
                         FoundNearestSupplyFragment foundNearestSupplyFragment = new FoundNearestSupplyFragment();
                         foundNearestSupplyFragment.setArguments(bundle);
 
