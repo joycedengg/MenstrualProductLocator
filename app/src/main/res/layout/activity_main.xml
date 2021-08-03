@@ -11,12 +11,20 @@
         android:id="@+id/flContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottomNavigation"/>
+        android:layout_above="@+id/bottom_bar"/>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
+    <nl.joery.animatedbottombar.AnimatedBottomBar
+        android:id="@+id/bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        app:menu="@menu/menu_bottom_navigation" />
+        android:background="#FFF"
+        app:abb_tabAnimation="slide"
+        app:abb_rippleEnabled="true"
+        app:abb_rippleColor="@color/purple_200"
+        app:abb_indicatorAppearance="round"
+        app:abb_indicatorHeight="4dp"
+        app:abb_indicatorMargin="16dp"
+        app:abb_selectedTabType="text"
+        app:abb_tabs="@menu/menu_bottom_navigation" />
 </RelativeLayout>
