@@ -9,6 +9,9 @@ import com.parse.livequery.ParseLiveQueryClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+
 
 public class ParseApplication extends Application {
 
@@ -18,13 +21,20 @@ public class ParseApplication extends Application {
 
         ParseObject.registerSubclass(Supply.class);
         ParseObject.registerSubclass(Request.class);
+        ParseObject.registerSubclass(Message.class);
 
-        Parse.initialize(new Parse.Configuration.Builder(this)
-                .applicationId(getString(R.string.back4app_app_id))
-                .clientKey(getString(R.string.back4app_client_key))
-                .server(getString(R.string.back4app_server_url))
-                .build());
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        HttpLoggingInterceptor httpLoggingInterceptor = new HttpLoggingInterceptor();
+        httpLoggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        builder.networkInterceptors().add(httpLoggingInterceptor);
 
-        ParseLiveQueryClient parseLiveQueryClient = null;
+
+
+            Parse.initialize(new Parse.Configuration.Builder(this)
+                    .applicationId(getString(R.string.back4app_app_id))
+                    .clientKey(getString(R.string.back4app_client_key))
+                    .clientBuilder(builder)
+                    .server("https://estro.b4a.io")
+                    .build());
     }
 }
