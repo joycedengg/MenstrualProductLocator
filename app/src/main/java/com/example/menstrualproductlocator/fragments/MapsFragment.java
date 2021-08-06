@@ -47,7 +47,11 @@ import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.parse.Parse;
+import com.parse.ParseGeoPoint;
 import com.parse.ParseUser;
+
+import org.jetbrains.annotations.NotNull;
 
 public class MapsFragment extends Fragment {
 
@@ -110,6 +114,17 @@ public class MapsFragment extends Fragment {
                     Supply supply = new Supply();
                     supply.setSupplyBuilding("test");
                     supply.setSupplyLocation(Utils.getCurrentUserLocation(getActivity(), locationManager));
+                    supply.saveInBackground();
+                    Utils.showSuppliesInMap(map);
+                }
+            });
+
+            map.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(@NonNull @NotNull LatLng latLng) {
+                    Supply supply = new Supply();
+                    supply.setSupplyBuilding("test");
+                    supply.setSupplyLocation(new ParseGeoPoint(latLng.latitude, latLng.longitude));
                     supply.saveInBackground();
                     Utils.showSuppliesInMap(map);
                 }
