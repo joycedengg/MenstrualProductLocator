@@ -24,6 +24,7 @@ import com.example.menstrualproductlocator.Message;
 import com.example.menstrualproductlocator.R;
 import com.example.menstrualproductlocator.databinding.FragmentChatBinding;
 import com.parse.FindCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -166,7 +167,7 @@ public class ChatFragment extends Fragment {
         mMessages = new ArrayList<>();
         mFirstLoad = true;
         final String userId = ParseUser.getCurrentUser().getObjectId();
-        mAdapter = new ChatAdapter(getContext(), userId, mMessages);
+        mAdapter = new ChatAdapter(getContext(), userId, mMessages, ParseUser.getCurrentUser());
         rvNotifications.setAdapter(mAdapter);
 
         final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -195,6 +196,7 @@ public class ChatFragment extends Fragment {
 
     void refreshMessages() {
         ParseQuery<Message> query = ParseQuery.getQuery(Message.class);
+        query.include(Message.USER_KEY);
         query.setLimit(MAX_CHAT_MESSAGES_TO_SHOW);
 
         query.orderByDescending("createdAt");

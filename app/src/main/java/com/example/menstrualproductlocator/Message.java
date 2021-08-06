@@ -2,10 +2,12 @@ package com.example.menstrualproductlocator;
 
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 
 @ParseClassName("Message")
 public class Message extends ParseObject {
     public static final String USER_ID_KEY = "userId";
+    public static final String USER_KEY = "user";
     public static final String BODY_KEY = "body";
     public static final String USERNAME_KEY = "username";
 
@@ -28,4 +30,8 @@ public class Message extends ParseObject {
     public String getUsername() { return getString(USERNAME_KEY); }
 
     public void setUsername(String username) { put(USERNAME_KEY, username); }
+
+    public ParseUser getUser() {
+        return getParseUser(USER_KEY);
+    }
 }

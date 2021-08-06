@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.parse.Parse;
 import com.parse.ParseObject;
+import com.parse.ParseUser;
 import com.parse.livequery.ParseLiveQueryClient;
 
 import java.net.URI;

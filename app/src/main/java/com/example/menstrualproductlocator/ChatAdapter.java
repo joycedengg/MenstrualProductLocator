@@ -1,6 +1,7 @@
 package com.example.menstrualproductlocator;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-//import com.bumptech.glide.Glide;
+import com.bumptech.glide.Glide;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -21,15 +24,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
     private List<Message> mMessages;
     private Context mContext;
     private String mUserId;
+    private ParseUser mUser;
 
     private static final int MESSAGE_OUTGOING = 123;
     private static final int MESSAGE_INCOMING = 321;
 
 
-    public ChatAdapter(Context context, String userId, List<Message> messages) {
+    public ChatAdapter(Context context, String userId, List<Message> messages, ParseUser user) {
         mMessages = messages;
         this.mUserId = userId;
         mContext = context;
+        mUser = user;
     }
 
     @Override
@@ -60,10 +65,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         @Override
         public void bindMessage(Message message) {
-//            Glide.with(mContext)
-//                    .load(getProfileUrl(message.getUserId()))
-//                    .circleCrop() // create an effect of a round profile picture
-//                    .into(imageOther);
+            Log.i("TAG", "bindMessage: " + message.getUser().getParseFile("profilePic").getUrl());
+            Glide.with(mContext)
+                    .load(message.getUser().getParseFile("profilePic").getUrl())
+                    .circleCrop() // create an effect of a round profile picture
+                    .into(imageOther);
             body.setText(message.getBody());
             name.setText(message.getUsername());
 
@@ -82,10 +88,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         @Override
         public void bindMessage(Message message) {
-//            Glide.with(mContext)
-//                    .load(getProfileUrl(message.getUserId()))
-//                    .circleCrop() // create an effect of a round profile picture
-//                    .into(imageMe);
+            Log.i("TAG", "bindMessage: " + message.getUser().getParseFile("profilePic").getUrl());
+            Glide.with(mContext)
+                    .load(message.getUser().getParseFile("profilePic").getUrl())
+                    .circleCrop() // create an effect of a round profile picture
+                    .into(imageMe);
             body.setText(message.getBody());
         }
 
@@ -123,18 +130,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MessageViewHol
 
         abstract void bindMessage(Message message);
     }
-    private static String getProfileUrl(final String userId) {
-        String hex = "";
-        try {
-            final MessageDigest digest = MessageDigest.getInstance("MD5");
-            final byte[] hash = digest.digest(userId.getBytes());
-            final BigInteger bigInt = new BigInteger(hash);
-            hex = bigInt.abs().toString(16);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return "https://www.gravatar.com/avatar/" + hex + "?d=identicon";
-    }
+
 
     private boolean isMe(int position) {
         Message message = mMessages.get(position);
